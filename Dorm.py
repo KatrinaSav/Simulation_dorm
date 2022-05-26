@@ -1,6 +1,7 @@
 from Student import Student
 from Room import Room
 
+
 class Dorm:
     __month: int
     __student_list: list[Student] = []

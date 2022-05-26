@@ -1,15 +1,6 @@
-# This is a sample Python script.
-
-# Press Shift+F10 to execute it or replace it with your code.
-# Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
-import random
-import pickle
 import unittest
-import pickle
-
 from main import Student
 from main import Room
-
 
 
 class TestStudent(unittest.TestCase):
@@ -24,6 +15,7 @@ class TestStudent(unittest.TestCase):
         for x in range(2):
             self.student.give_ban()
         self.assertTrue(self.student.check_kick())
+
 
 class TestRoom(unittest.TestCase):
     def setUp(self):
@@ -59,7 +51,6 @@ class TestRoom(unittest.TestCase):
         self.room.set_roach(True)
         self.room.kill_roach()
         self.assertFalse(self.room.get_is_roach_in_room())
-
 
 
 if __name__ == "__main__":
