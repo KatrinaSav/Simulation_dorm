@@ -1,7 +1,13 @@
 import pickle
+import click as click
+from click_shell import shell
+from Mentor import Mentor
 
 
-if __name__ == '__main__':
+@shell(prompt='Общежитие > ', intro='Запуск симуляции...')
+def main():
+    global our_dorm
+    global mentor
     with open('saved_step.pickle', 'rb') as f:
         our_dorm = pickle.load(f)
     f.close()
@@ -15,62 +21,55 @@ if __name__ == '__main__':
     our_dorm.noise_in_dorm()
     our_dorm.visit_every_room()
     our_dorm.change_duty()
+    mentor = Mentor(our_dorm)
+    mentor.check_room()
+    our_dorm.save_to_file()
     our_dorm.print_field()
-    while True:
-        entry = input('Введите команду\n')
-        split_entry = entry.split()
-        if split_entry[0] == 'help':
-            print('kill_roach \'номер\' - убить тараканов в комнате\n'
-                  'print_info_room \'номер\' - вывод информации о комнате\n'
-                  'print_info_dorm - вывод информации об общежитии\n'
-                  'check_in \'номер\'- заселить студентов в комнату\n'
-                  'print_map - вывод карты общежития'
-                  'exit - выход')
-        elif split_entry[0] == 'kill_roach':
-            for x in range(1, len(split_entry)):
-                try:
-                    number_of_room = int(split_entry[x])
-                    try:
-                        room = our_dorm.get_room_by_number(number_of_room)
-                        room.kill_roach()
-                    except IndexError:
-                        print('В общежитии 15 комнат, введите число от 1 до 15')
-                except ValueError:
-                    print('Ожидается номер комнаты для очистки')
-        elif split_entry[0] == 'print_info_room':
-            try:
-                number_of_room = int(split_entry[1])
-                try:
-                    room = our_dorm.get_room_by_number(number_of_room)
-                    room.print_info()
-                except IndexError:
-                    print('В общежитии 15 комнат, введите число от 1 до 15')
-            except ValueError:
-                print('Ожидается номер комнаты для вывода информации')
-        elif split_entry[0] == 'print_info_dorm':
-            our_dorm.print_info()
-        elif split_entry[0] == 'check_in':
-            for x in range(1, len(split_entry)):
-                try:
-                    number_of_room = int(split_entry[x])
-                    try:
-                        room = our_dorm.get_room_by_number(number_of_room)
-                        our_dorm.check_in(room)
-                    except IndexError:
-                        print('В общежитии 15 комнат, введите число от 1 до 15')
-                except ValueError:
-                    print('Ожидается номер комнаты для заселения')
-        elif split_entry[0] == 'print_map':
-            our_dorm.print_field()
-        elif split_entry[0] == 'exit':
-            break
-        else:
-            print('Неверный ввод, введите \'help\' чтобы увидеть список команд')
-    with open("saved_step.pickle", "wb") as write_file:
-        pickle.dump(our_dorm, write_file)
-    write_file.close()
 
-    with open("saved_step_2.pickle", "wb") as write_file:
-        pickle.dump(our_dorm.get_room_list(), write_file)
-    write_file.close()
+    @main.command(help='Травить тараканов в комнате №[1..15]')
+    @click.argument('number')
+    def kill_roach(number):
+        try:
+            room = our_dorm.get_room_by_number(int(number))
+            room.kill_roach()
+            our_dorm.save_to_file()
+        except IndexError:
+            print('В общежитии 15 комнат')
+
+    @main.command(help='Вывести информацию о комнате №[1..15]')
+    @click.argument('number')
+    def print_info_room(number):
+        try:
+            room = our_dorm.get_room_by_number(int(number))
+            room.print_info()
+        except IndexError:
+            print('В общежитии 15 комнат')
+
+    @main.command(help='Заселить студента в комнату №[1..15]')
+    @click.argument('number')
+    def check_in(number):
+        try:
+            room = our_dorm.get_room_by_number(int(number))
+            our_dorm.check_in(room)
+            our_dorm.save_to_file()
+        except IndexError:
+            print('В общежитии 15 комнат')
+
+    @main.command()
+    def print_info_dorm():
+        our_dorm.print_info()
+
+    @main.command()
+    def mentor_info():
+        mentor.print_info()
+
+    @main.command()
+    def print_map():
+        our_dorm.print_field()
+
+if __name__ == '__main__':
+    main()
+
+
+
 

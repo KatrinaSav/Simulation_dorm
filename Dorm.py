@@ -1,3 +1,6 @@
+import pickle
+import random
+
 from Student import Student
 from Room import Room
 
@@ -111,9 +114,20 @@ class Dorm:
                 self.__room_list[14].add_neighbour_room(self.__room_list[9])
         self.__room_list[0].set_duty(True)
 
+    def save_to_file(self):
+        with open("saved_step.pickle", "wb") as write_file:
+            pickle.dump(self, write_file)
+        write_file.close()
+        with open("saved_step_2.pickle", "wb") as write_file:
+            pickle.dump(self.__room_list, write_file)
+        write_file.close()
+
     def find_all_students(self):
         for each_room in self.__room_list:
             self.__student_list.extend(each_room.get_students())
+
+    def get_student_list(self):
+        return self.__student_list
 
     def get_room_list(self):
         return self.__room_list
